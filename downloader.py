@@ -20,12 +20,17 @@ class Segment:
         self.res = None
 
     async def get(self):
+        c = 0
         while True:
             res = await web.get(self.url)
             if res.status == 200:
                 self.res = await res.read()
                 return
-            error("Could not get segment {} of {} ({}). Retrying...".format(self.idx+1, self.title, await res.text()))
+            error("Could not get segment {} of {} ({}: {}). Retrying...".format(self.idx+1, self.title, res.status, await res.text()))
+            c += 1
+            if c == int(getenv("MAX_SEG_RETRIES", "3")):
+                error("Failed to get segment {} of {}. Skipping...".format(self.idx+1, self.title))
+                return
             await sleep(10)
 
 class Player:
