@@ -91,7 +91,8 @@ class Player:
         await ev.wait()
         async with aopen(self.title+".ts", "wb+") as f:
             for item in self.dl_queue:
-                await f.write(item.res)
+                if item.res:
+                    await f.write(item.res)
         info("Downloaded {}".format(self.title))
 
 async def get_player(cid):
